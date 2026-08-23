@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes Desktop 入门使用教程 — 从安装完成到日常工作流</title>
+<style>
+:root{
+  --bg:#F8F9FB; --surface:#FFFFFF; --surface-2:#F1F3F7; --border:#E4E7EC;
+  --ink:#1C1C1E; --ink-2:#494950; --ink-3:#8A8A93; --titanium:#A1A1AA;
+  --gold:#F59E0B; --gold-soft:#FEF3E2;
+  --blue:#2563EB; --blue-soft:#EFF4FF;
+  --green:#16A34A; --green-soft:#EAF7EF;
+  --red:#DC2626; --red-soft:#FDEEEE;
+  --code-bg:#1C1C1E; --code-ink:#E8E8EC;
+  --radius:12px; --shadow:0 1px 2px rgba(28,28,30,.05),0 4px 16px rgba(28,28,30,.06);
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;font-size:15.5px}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
+
+/* header */
+.hero{background:linear-gradient(135deg,#1C1C1E 0%,#2C2C31 60%,#3A3A41 100%);color:#fff;padding:56px 24px 48px;margin-bottom:40px}
+.hero-inner{max-width:960px;margin:0 auto}
+.hero .kicker{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(245,158,11,.4);border-radius:999px;padding:4px 14px;margin-bottom:18px;background:rgba(245,158,11,.08)}
+.hero h1{font-size:34px;font-weight:700;letter-spacing:-.02em;margin-bottom:14px;line-height:1.3}
+.hero p.sub{color:#C9C9D0;font-size:16px;max-width:640px}
+.hero .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;font-size:13px}
+.hero .meta span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 12px;color:#D4D4DA}
+.hero .meta b{color:var(--gold);font-weight:600}
+
+/* TOC */
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin-bottom:40px;box-shadow:var(--shadow)}
+.toc h2{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-bottom:14px}
+.toc ol{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+.toc a{color:var(--ink);text-decoration:none;font-size:14.5px;display:flex;gap:10px;align-items:baseline;padding:4px 0;border-bottom:1px dashed transparent}
+.toc a:hover{color:var(--blue)}
+.toc .n{font-family:var(--mono);font-size:12px;color:var(--gold);min-width:20px}
+@media(max-width:640px){.toc ol{grid-template-columns:1fr}}
+
+/* sections */
+section{margin-bottom:56px}
+h2.sec{font-size:24px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px;display:flex;align-items:center;gap:12px}
+h2.sec .idx{font-family:var(--mono);font-size:13px;color:#fff;background:var(--ink);border-radius:8px;padding:2px 10px;font-weight:600}
+h3{font-size:17.5px;font-weight:650;margin:26px 0 10px}
+h4{font-size:15px;font-weight:650;margin:18px 0 8px}
+p{margin-bottom:12px;color:var(--ink-2)}
+.lead{font-size:16px;color:var(--ink-2)}
+ul.plain,ol.plain{margin:8px 0 14px 22px;color:var(--ink-2)}
+ul.plain li,ol.plain li{margin-bottom:6px}
+strong{color:var(--ink);font-weight:650}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;margin:18px 0;box-shadow:var(--shadow)}
+.card.gold{border-left:4px solid var(--gold)}
+.card.blue{border-left:4px solid var(--blue)}
+.card.green{border-left:4px solid var(--green)}
+.card.red{border-left:4px solid var(--red)}
+.card h4{margin-top:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.mini{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.mini h5{font-size:14.5px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.mini p{font-size:13.5px;margin:0;color:var(--ink-2)}
+
+/* badge */
+.badge{display:inline-block;font-size:11.5px;font-weight:600;border-radius:6px;padding:2px 8px;vertical-align:2px}
+.badge.mac{background:var(--blue-soft);color:var(--blue)}
+.badge.win{background:var(--blue-soft);color:#4F46E5}
+.badge.linux{background:var(--green-soft);color:var(--green)}
+.badge.all{background:var(--gold-soft);color:#B45309}
+.badge.new{background:var(--green-soft);color:var(--green)}
+
+/* kbd */
+kbd{font-family:var(--mono);font-size:12px;background:var(--surface-2);border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;padding:2px 7px;color:var(--ink);white-space:nowrap}
+
+/* code */
+.codeblock{position:relative;background:var(--code-bg);border-radius:10px;margin:14px 0;overflow:hidden}
+.codeblock pre{padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--code-ink)}
+.codeblock .lang{position:absolute;top:8px;right:52px;font-family:var(--mono);font-size:10.5px;color:#71717A;letter-spacing:.05em}
+.codeblock .copy{position:absolute;top:6px;right:6px;background:rgba(255,255,255,.08);color:#C9C9D0;border:none;border-radius:6px;font-size:11.5px;padding:4px 10px;cursor:pointer;font-family:inherit}
+.codeblock .copy:hover{background:rgba(255,255,255,.16)}
+.codeblock .copy.done{color:#4ADE80}
+.code-inline{font-family:var(--mono);font-size:.88em;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--ink)}
+.prompt-line{color:#FBBF24}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin:14px 0;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;font-size:14px;box-shadow:var(--shadow)}
+th{background:var(--surface-2);text-align:left;padding:10px 14px;font-size:13px;font-weight:650;color:var(--ink);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--ink-2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFBFD}
+td kbd{white-space:nowrap}
+.tbl-scroll{overflow-x:auto;border-radius:10px}
+.tbl-scroll table{margin:14px 0}
+
+/* callouts */
+.note{display:flex;gap:12px;background:var(--blue-soft);border:1px solid #D6E0FB;border-radius:10px;padding:14px 18px;margin:16px 0;font-size:14px;color:#1E3A8A}
+.note.warn{background:var(--gold-soft);border-color:#F5DFB8;color:#92400E}
+.note.danger{background:var(--red-soft);border-color:#F5C9C9;color:#991B1B}
+.note .ico{font-size:16px;line-height:1.6}
+
+/* steps */
+.steps{counter-reset:step;margin:18px 0}
+.step{position:relative;padding:0 0 22px 52px;border-left:2px solid var(--border);margin-left:18px}
+.step:last-child{border-left-color:transparent;padding-bottom:0}
+.step::before{counter-increment:step;content:counter(step);position:absolute;left:-19px;top:0;width:36px;height:36px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;font-family:var(--mono);border:4px solid var(--bg)}
+.step h4{margin:6px 0 6px;font-size:16px}
+.step p{font-size:14.5px}
+
+/* footer */
+.src-note{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;font-size:13px;color:var(--ink-3);margin-top:50px}
+.src-note b{color:var(--ink-2)}
+footer{padding:30px 0 10px;text-align:center;font-size:13px;color:var(--ink-3)}
+
+/* anatomy diagram */
+.anatomy{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin:18px 0;box-shadow:var(--shadow)}
+.anatomy-grid{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:8px;margin-bottom:10px}
+.anat-col{border:1.5px solid var(--border);border-radius:10px;padding:12px;background:var(--surface-2)}
+.anat-col h5{font-size:13.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.anat-col ul{list-style:none;font-size:12.5px;color:var(--ink-2)}
+.anat-col li{padding:4px 6px;border-radius:5px;margin-bottom:3px;background:var(--surface);border:1px solid var(--border)}
+.anat-col.main{border-color:var(--gold);background:var(--gold-soft)}
+.anat-statusbar{border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;background:var(--surface-2);font-size:12.5px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:2px}
+.anat-statusbar span{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:2px 8px}
+.anatomy .cap{font-size:12.5px;color:var(--ink-3);text-align:center;margin-top:10px}
+@media(max-width:700px){.anatomy-grid{grid-template-columns:1fr}}
+
+/* feature tiles */
+.tile{display:flex;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow)}
+.tile .ic{width:40px;height:40px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.tile h4{margin:0 0 4px;font-size:15.5px}
+.tile p{font-size:13.8px;margin-bottom:4px}
+.tile .keys{font-size:12.5px;color:var(--ink-3);margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="kicker">TUTORIAL · 入门使用</span>
+    <h1>Hermes Desktop 入门使用教程</h1>
+    <p class="sub">从「安装完成」到「日常工作流」——认识界面、跑通第一场对话、掌握核心功能、看懂排错路径。本篇专注 Desktop 桌面端，30 分钟读完上手。</p>
+    <div class="meta">
+      <span>配套阅读：<b>Hermes 一键安装指南</b></span>
+      <span>依据：<b>hermes-agent.nousresearch.com 官方文档</b></span>
+      <span>内容核验时点：<b>2026-08-23</b></span>
+      <span>平台：<b>macOS / Windows / Linux</b></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h2>目录</h2>
+  <ol>
+    <li><a href="#s1"><span class="n">01</span>Hermes Desktop 是什么</a></li>
+    <li><a href="#s2"><span class="n">02</span>首次启动与引导</a></li>
+    <li><a href="#s3"><span class="n">03</span>界面导览</a></li>
+    <li><a href="#s4"><span class="n">04</span>跑通第一场对话</a></li>
+    <li><a href="#s5"><span class="n">05</span>对话进阶技巧</a></li>
+    <li><a href="#s6"><span class="n">06</span>六大核心功能</a></li>
+    <li><a href="#s7"><span class="n">07</span>管理面板速览</a></li>
+    <li><a href="#s8"><span class="n">08</span>设置要点</a></li>
+    <li><a href="#s9"><span class="n">09</span>快捷键速查表</a></li>
+    <li><a href="#s10"><span class="n">10</span>排错与恢复</a></li>
+    <li><a href="#s11"><span class="n">11</span>学习路径</a></li>
+  </ol>
+</nav>
+
+<!-- ================= 01 ================= -->
+<section id="s1">
+  <h2 class="sec"><span class="idx">01</span>Hermes Desktop 是什么</h2>
+  <p class="lead">一句话：<strong>Desktop 不是另一个产品，而是同一个 Hermes Agent 的原生桌面外壳。</strong>它和 CLI、TUI、Web Dashboard 共享同一套配置、API 密钥、会话、技能与记忆——在终端聊到一半的会话，回到 Desktop 可以直接续上。</p>
+
+  <div class="card blue">
+    <h4>四个前端，一份状态</h4>
+    <ul class="plain">
+      <li><strong>Desktop App</strong> — 原生界面，聊天 + 配置 + 管理一体（本篇主角）</li>
+      <li><strong>CLI</strong>（<span class="code-inline">hermes</span>）/ <strong>TUI</strong>（<span class="code-inline">hermes --tui</span>）— 终端界面</li>
+      <li><strong>Web Dashboard</strong>（<span class="code-inline">hermes dashboard</span>）— 浏览器管理面板</li>
+    </ul>
+    <p style="margin-bottom:0;font-size:14px;color:var(--ink-3)">任何一端开启的会话，都能在另一端恢复继续。</p>
+  </div>
+
+  <h3>为什么用 Desktop 而不是终端</h3>
+  <div class="grid2">
+    <div class="mini"><h5>🖥️ 图形化一切</h5><p>供应商、模型、工具、密钥都在设置面板里点选，不用手改 YAML。</p></div>
+    <div class="mini"><h5>⚡ 流式工具输出</h5><p>Agent 干活的过程实时可见，工具调用以结构化卡片展示。</p></div>
+    <div class="mini"><h5>🔭 并排预览</h5><p>网页、文件、工具输出在右侧预览轨里与聊天同时呈现。</p></div>
+    <div class="mini"><h5>🗂️ 文件浏览器 + 终端</h5><p>不离开 App 就能浏览工作目录、开终端、看 Git diff。</p></div>
+  </div>
+
+  <div class="note">
+    <span class="ico">💡</span>
+    <div>已装过 CLI？直接跑 <span class="code-inline">hermes desktop</span> 即可启动桌面端，沿用现有配置、密钥、会话与技能，无需重新设置。</div>
+  </div>
+</section>
+
+<!-- ================= 02 ================= -->
+<section id="s2">
+  <h2 class="sec"><span class="idx">02</span>首次启动与引导</h2>
+
+  <div class="steps">
+    <div class="step">
+      <h4>首次启动：安装运行时</h4>
+      <p>第一次打开 App，它会自动把 Hermes Agent 运行时装进 <strong>HERMES_HOME</strong>：</p>
+      <table>
+        <tr><th>平台</th><th>路径</th></tr>
+        <tr><td>macOS / Linux</td><td><span class="code-inline">~/.hermes</span></td></tr>
+        <tr><td>Windows</td><td><span class="code-inline">%LOCALAPPDATA%\hermes</span></td></tr>
+      </table>
+      <p style="margin-top:8px">这与 CLI 安装是同一套目录布局——所以两边天然共享状态。</p>
+    </div>
+    <div class="step">
+      <h4>引导页：选择供应商（或稍后再说）</h4>
+      <p>全新引导覆盖层会引导你选择模型供应商。不确定选哪个？点 <strong>「Choose provider later」</strong> 先进应用，之后再在 Settings 里配置——官方设计就是让你先看界面再决定。</p>
+    </div>
+    <div class="step">
+      <h4>macOS：授权麦克风</h4>
+      <p>系统会弹出一次麦克风权限请求，这是<strong>语音模式</strong>（Voice Mode）需要的。拒绝也不影响其他功能，之后想开启可去 系统设置 → 隐私与安全性 → 麦克风 里补授权。</p>
+    </div>
+    <div class="step">
+      <h4>完成，进入聊天主界面</h4>
+      <p>看到聊天优先的主窗口即启动成功。若启动失败，查日志：<span class="code-inline">~/.hermes/logs/desktop.log</span>，或终端里 <span class="code-inline">hermes logs gui -f</span> 实时跟踪。</p>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <span class="ico">⚡</span>
+    <div><strong>还没配置供应商？</strong>最短路径是在终端跑 <span class="code-inline">hermes setup --portal</span> ——一次 OAuth 登录同时搞定模型 + 四个 Tool Gateway 工具（网页搜索、图像生成、TTS、云浏览器）。详细步骤见配套的《一键安装指南》第 4 节。</div>
+  </div>
+</section>
+
+<!-- ================= 03 ================= -->
+<section id="s3">
+  <h2 class="sec"><span class="idx">03</span>界面导览</h2>
+  <p class="lead">Desktop 是<strong>聊天优先</strong>的窗口布局：中间是对话区，两侧是可折叠的栏。一分钟看懂整体结构：</p>
+
+  <div class="anatomy">
+    <div class="anatomy-grid">
+      <div class="anat-col">
+        <h5>⬅️ 左侧栏 <kbd>Cmd/Ctrl+B</kbd></h5>
+        <ul>
+          <li>会话列表 · Sessions</li>
+          <li>项目 · Projects</li>
+          <li>Profiles</li>
+          <li>Bots 花名册</li>
+          <li>导航入口</li>
+        </ul>
+      </div>
+      <div class="anat-col main">
+        <h5>💬 对话区（主窗口）</h5>
+        <ul>
+          <li>会话标签页（多会话并行）</li>
+          <li>流式回复 + 工具调用卡片</li>
+          <li>输入框（含模型选择器、麦克风）</li>
+          <li>对话时间线标记</li>
+        </ul>
+      </div>
+      <div class="anat-col">
+        <h5>➡️ 右侧栏 <kbd>Cmd/Ctrl+J</kbd></h5>
+        <ul>
+          <li>预览轨（网页/文件/工具输出）</li>
+          <li>文件浏览器</li>
+          <li>终端（可多开）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="anat-statusbar">
+      <span>底部状态栏：上下文用量 · 工作区 · 模型 · 审批 · 计时器</span>
+    </div>
+    <div class="cap">Desktop 主窗口结构示意（两侧栏可通过 <kbd>Cmd/Ctrl+\</kbd> 互换左右位置）</div>
+  </div>
+
+  <h3>多标签 / 多窗口</h3>
+  <ul class="plain">
+    <li><kbd>Cmd/Ctrl+T</kbd> 新会话标签；<kbd>Ctrl+Tab</kbd> / <kbd>Ctrl+Shift+Tab</kbd> 在会话间轮换；<kbd>Ctrl+1…9</kbd> 按位置跳转</li>
+    <li><kbd>Cmd/Ctrl+W</kbd> 关闭标签，<kbd>Cmd/Ctrl+Shift+T</kbd> 恢复刚关的，<kbd>Cmd/Ctrl+Shift+N</kbd> 开新窗口</li>
+    <li>任何会话都可以通过右键菜单 <strong>「New window」</strong> 弹出成独立窗口——Agent 的实时输出会同时流进每个展示该会话的窗口</li>
+  </ul>
+
+  <h3>底部状态栏</h3>
+  <p>状态栏显示会话实时状态，右键可勾选显示项：上下文用量、工作区、模型、审批、回合/会话计时器、终端、Command Center、后端版本。<kbd>Cmd/Ctrl+Shift+S</kbd> 可整体隐藏。</p>
+  <div class="card gold">
+    <h4>⭐ 上下文用量表（Context Meter）</h4>
+    <p>状态栏里的「% 满」指示器实时显示当前会话上下文窗口占用。点击可展开明细：系统提示、工具定义、技能、记忆、规则、MCP、子代理定义、对话各占多少 token——长会话变慢时先看这里。</p>
+  </div>
+</section>
+
+<!-- ================= 04 ================= -->
+<section id="s4">
+  <h2 class="sec"><span class="idx">04</span>跑通第一场对话</h2>
+  <p class="lead">官方 Quickstart 的铁律：<strong>如果 Hermes 连一场普通对话都完不成，先别叠加任何功能。</strong>先拿到一场干净的对话，再去碰网关、cron、技能、语音。</p>
+
+  <div class="steps">
+    <div class="step">
+      <h4>新建会话</h4>
+      <p><kbd>Cmd/Ctrl+N</kbd> 或左上角新建按钮。</p>
+    </div>
+    <div class="step">
+      <h4>选模型</h4>
+      <p>输入框左侧、麦克风按钮旁边就是<strong>模型选择器</strong>。选一个就够——这个选择会记住（per 设备粘性），跨新会话和重启都跟随，但<strong>不会</strong>写进 Profile 默认值。</p>
+    </div>
+    <div class="step">
+      <h4>发第一条消息</h4>
+      <p>不知道说什么？官方示例三选一：</p>
+      <div class="codeblock"><span class="lang">PROMPT</span><button class="copy">复制</button><pre>用 5 条要点总结当前目录这个仓库，并指出主入口文件在哪。
+
+（或英文原版）
+Summarize this repo in 5 bullets and tell me what the main entrypoint is.</pre></div>
+      <p style="margin-top:8px">也可以更简单：<span class="code-inline">看看我当前目录里，哪个像主项目文件？</span></p>
+    </div>
+    <div class="step">
+      <h4>观察工具调用</h4>
+      <p>回复过程中你会看到<strong>流式输出 + 工具活动卡片</strong>——Hermes 调终端、读文件、搜网页的过程全部实时可见。右侧预览轨可能同时渲染出工具输出。</p>
+    </div>
+    <div class="step">
+      <h4>验证会话存活</h4>
+      <p>关闭后再进来，会话还在；终端里 <span class="code-inline">hermes --continue</span> 也能续上同一场对话——这就是「四端共享状态」的直接证据。</p>
+    </div>
+  </div>
+
+  <div class="card green">
+    <h4>✅ 「第一场对话成功」官方检查清单</h4>
+    <ul class="plain" style="margin-bottom:0">
+      <li>横幅显示了所选模型 / 供应商</li>
+      <li>Hermes 无报错地回复了</li>
+      <li>需要时它真的调用了工具（终端 / 文件读取 / 网页搜索）</li>
+      <li>对话正常延续了不止一轮</li>
+    </ul>
+    <p style="margin:10px 0 0;font-size:14px;color:var(--ink-3)">四条全过 = 你已经跨过了最难的部分。</p>
+  </div>
+</section>
+
+<!-- ================= 05 ================= -->
+<section id="s5">
+  <h2 class="sec"><span class="idx">05</span>对话进阶技巧</h2>
+
+  <h3>输入框（Composer）</h3>
+  <ul class="plain">
+    <li><strong>拖拽附件</strong>：把文件直接拖进聊天区域任意位置，即附到下一条消息</li>
+    <li><strong>历史提示召回</strong>：输入框为空时按 <kbd>↑</kbd> / <kbd>↓</kbd> 翻出之前的 prompt 复用</li>
+    <li><strong>消息排队</strong>：Agent 干活时可以继续输入排队；按 <kbd>Esc</kbd> 暂停队列并展开列表——排队消息支持发送前编辑、单条发送或删除</li>
+    <li><strong>打断</strong>：直接发一条新消息即可打断当前任务转向新指令</li>
+  </ul>
+
+  <h3>查找与导航</h3>
+  <ul class="plain">
+    <li><kbd>Cmd/Ctrl+F</kbd> 页内查找聊天记录，<kbd>Enter</kbd>/<kbd>Shift+Enter</kbd> 及 <kbd>Cmd/Ctrl+G</kbd> 逐个跳匹配</li>
+    <li><strong>对话时间线轨道</strong>：聊过几轮后，对话区边缘出现一列小标记（每个对应一条 prompt），悬停展开 prompt 列表，点击直接跳转到那个位置</li>
+    <li><kbd>Cmd/Ctrl+Shift+F</kbd> 跨会话搜索</li>
+  </ul>
+
+  <h3>模型切换须知</h3>
+  <table>
+    <tr><th>行为</th><th>说明</th></tr>
+    <tr><td>输入框选模型</td><td>粘性 UI 状态（per 设备记忆），跟随新会话与重启；<strong>不写入</strong> Profile 默认</td></tr>
+    <tr><td>会话中途切换</td><td>只作用于<strong>当前这场对话</strong></td></tr>
+    <tr><td>设全局默认</td><td><strong>Settings → Model</strong>，作用于新会话、cron、子代理与辅助任务</td></tr>
+    <tr><td>中途切模型的代价</td><td>会<strong>重置提示缓存</strong>——整段对话按完整输入价格重新计费读一遍</td></tr>
+    <tr><td>推理力度/快速模式</td><td>每个模型分别记住自己的 effort 与 fast 预设</td></tr>
+  </table>
+
+  <h3>斜杠命令照样能用</h3>
+  <p>Desktop 聊天兼容终端的斜杠命令体系。输入 <span class="code-inline">/</span> 会弹出自动补全列表。新手最常用的几个：</p>
+  <table>
+    <tr><th>命令</th><th>作用</th></tr>
+    <tr><td><span class="code-inline">/help</span></td><td>列出全部可用命令</td></tr>
+    <tr><td><span class="code-inline">/tools</span></td><td>查看当前可用工具</td></tr>
+    <tr><td><span class="code-inline">/model</span></td><td>交互式切换模型</td></tr>
+    <tr><td><span class="code-inline">/save</span></td><td>保存当前对话</td></tr>
+    <tr><td><span class="code-inline">/journey</span></td><td>打开记忆星图（见第 6 节）</td></tr>
+  </table>
+</section>
+
+<!-- ================= 06 ================= -->
+<section id="s6">
+  <h2 class="sec"><span class="idx">06</span>六大核心功能</h2>
+  <p class="lead">这是 Desktop 相对终端的真正增量价值，按日常使用频率排序。</p>
+
+  <div class="tile">
+    <div class="ic">🔭</div>
+    <div>
+      <h4>① 右侧预览轨（Preview Rail）</h4>
+      <p>聊天时，Agent 打开的网页、生成的文件、工具输出在右侧栏<strong>并排实时渲染</strong>——不用在聊天和结果之间来回切换。这是「边聊边看」的核心体验。</p>
+      <p class="keys"><kbd>Cmd/Ctrl+J</kbd> 开关右侧栏</p>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="ic">🖼️</div>
+    <div>
+      <h4>② Artifacts 产物画廊</h4>
+      <p>所有会话生成的<strong>图片、文件、链接</strong>自动汇入一个可搜索的画廊视图；每件产物标注来源会话，点击可跳回当时的那场聊天；图片和文件支持预览、下载、复制、在浏览器打开。</p>
+      <p class="keys">入口：左侧栏 或 命令面板 → 「Artifacts — Browse generated outputs」</p>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="ic">⌨️</div>
+    <div>
+      <h4>③ 内置终端 + Add to Chat</h4>
+      <p>右侧栏内置终端，可多开、隐藏时 shell 不被杀掉。杀手锏是 <strong>「Add to chat」</strong>：选中终端输出，一键送进输入框作为下一条消息的上下文——排查报错时极其顺手。</p>
+      <p class="keys"><kbd>Ctrl+`</kbd> 开终端 · <kbd>Ctrl+Shift+`</kbd> 再开一个 · <kbd>Ctrl+Shift+↓/↑</kbd> 终端间切换</p>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="ic">🌿</div>
+    <div>
+      <h4>④ Git 审查面板与 Worktree</h4>
+      <p>不用离开 App 就能看分支领先/落后、变更文件列表与 diff（可按 <strong>未提交 / 本分支 / 上一回合</strong> 三种范围过滤——「上一回合」= 只看 Agent 刚才这轮改了什么）。支持暂存/撤销、<strong>自动生成 commit message</strong>、Commit &amp; Push、经 <span class="code-inline">gh</span> 建 PR，或干脆让 Hermes 代劳开 PR。还能一键建 Git worktree 开平行分支。</p>
+      <p class="keys"><kbd>Cmd/Ctrl+G</kbd> 审查面板 · <kbd>Cmd/Ctrl+Shift+B</kbd> 新建 worktree</p>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="ic">🎙️</div>
+    <div>
+      <h4>⑤ 语音模式</h4>
+      <p>点输入框旁的麦克风按钮进入——对话，Hermes 回话可听。与 CLI / Telegram / Discord 的语音模式同一套后端。macOS 首次使用需授权麦克风。</p>
+      <p class="keys">模型选择器位于麦克风左侧，语音会话同样可换模型</p>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="ic">🌌</div>
+    <div>
+      <h4>⑥ 记忆星图（Memory Graph / Star Map）+ 学习闭环</h4>
+      <p>Hermes 的招牌：它从经验中<strong>自动创建技能、使用中自我改进、跨会话沉淀对你本人的认知</strong>。星图把这些学到的技能与记忆渲染成可缩放的节点星座图 + 时间线，按 <strong>All / Used / Learned</strong> 过滤，节点可编辑可删除。在聊天里输入 <span class="code-inline">/journey</span> 还能带播放进度条回放学习历程。</p>
+      <p class="keys">入口：命令面板 → Memory Graph，或聊天中 <span class="code-inline">/journey</span></p>
+    </div>
+  </div>
+
+  <h3>两个「全局随时呼出」的效率神器</h3>
+  <div class="grid2">
+    <div class="mini">
+      <h5>🪟 HUD 悬浮模式</h5>
+      <p><kbd>Cmd/Ctrl+Shift+H</kbd> 把聊天剥离成一个无边框置顶小条。位置本身就是语境——问「这个」「这页」时，Hermes 知道你指的是下方的应用和屏幕。<kbd>Cmd/Ctrl+Shift+G</kbd> 全局快捷键把 HUD 吸附到鼠标处。</p>
+    </div>
+    <div class="mini">
+      <h5>⚡ Quick Entry</h5>
+      <p>系统级全局热键，任何应用里按 <kbd>Ctrl/Cmd+Shift+Space</kbd>（默认，可改键）呼出一个迷你输入框随手问 Hermes。在 <strong>Settings → Advanced → Quick Entry</strong> 开启。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 ================= -->
+<section id="s7">
+  <h2 class="sec"><span class="idx">07</span>管理面板速览</h2>
+  <p class="lead">左侧栏下半部分是管理入口，全部图形化操作，对应终端里的一条条子命令。</p>
+
+  <table>
+    <tr><th>面板</th><th>干什么用</th><th>终端等价物</th></tr>
+    <tr><td><strong>Skills</strong></td><td>浏览 / 搜索 / 启停已装技能，从技能 Hub 搜索安装（带实时安装日志），一键 Update all</td><td><span class="code-inline">hermes skills</span></td></tr>
+    <tr><td><strong>Cron</strong></td><td>创建定时任务：名称 + prompt + cron 表达式（如 <span class="code-inline">0 9 * * *</span>）+ 投递目标（本地/Telegram/Discord/Slack/邮件）；支持暂停、立即触发、编辑</td><td><span class="code-inline">hermes cron</span></td></tr>
+    <tr><td><strong>Profiles</strong></td><td>切换/创建隔离实例——每个 Profile 有自己的配置、技能、会话；支持整套导出导入（<kbd>⌘K</kbd> → Export profile…，导出为 <span class="code-inline">.tar.gz</span>，密钥自动剥离）</td><td><span class="code-inline">hermes profile</span></td></tr>
+    <tr><td><strong>Messaging</strong></td><td>把 Hermes 接入 Telegram / Discord / Slack / 飞书 / 企微 / 微信 / QQ Bot 等 20+ 平台，逐平台表单配置 + 测试连接</td><td><span class="code-inline">hermes gateway setup</span></td></tr>
+    <tr><td><strong>Bots</strong></td><td>Bot Mode（默认开启）：每个 Profile 化身一个 Bot，出现在「Sessions | Bots」花名册里；支持群聊多 Bot 讨论、<span class="code-inline">@某Bot</span> 互相转交任务、隐藏/取消隐藏</td><td>—</td></tr>
+    <tr><td><strong>Agents / Command Center</strong></td><td>多代理编排界面</td><td>—</td></tr>
+  </table>
+
+  <div class="note">
+    <span class="ico">🤖</span>
+    <div><strong>Bot 小玩法</strong>：在任何聊天里输入 <span class="code-inline">@researcher 帮我看看这个</span>——当前 Bot 会把任务转交给 researcher 并回报结果。Bot 头像支持几何脸、上传图片、AI 生成肖像或像素宠物。</div>
+  </div>
+</section>
+
+<!-- ================= 08 ================= -->
+<section id="s8">
+  <h2 class="sec"><span class="idx">08</span>设置要点</h2>
+  <p><kbd>Cmd/Ctrl+,</kbd> 打开设置。新手最需要知道的几页：</p>
+
+  <h3>Providers — 账号与密钥</h3>
+  <p>图形化的「账户 / API Key」页：支持 Nous Portal OAuth、OpenAI Codex 设备码、Anthropic OAuth、xAI Grok OAuth 等浏览器登录流，也可以直接粘贴各家的 API Key。密钥写入 <span class="code-inline">~/.hermes/.env</span>。</p>
+  <div class="note warn">
+    <span class="ico">⚠️</span>
+    <div>Hermes 要求模型<strong>至少 64K token 上下文</strong>，小窗口模型会在启动时被拒。本地模型记得把 ctx size 调到 ≥ 64K（如 Ollama 加 <span class="code-inline">-c 65536</span>）。</div>
+  </div>
+
+  <h3>Model — 全局默认模型</h3>
+  <p>这里是<strong>真正的默认模型</strong>所在（输入框那个选择器只是设备级 UI 偏好）。默认模型作用于新会话、cron 任务、子代理和辅助任务。</p>
+
+  <h3>Gateways — 本地 / 远程 / 云端</h3>
+  <p>Desktop 默认自己拉起并管理一个本地后端。进阶玩法是指向别处：</p>
+  <ul class="plain">
+    <li><strong>Remote gateway</strong> — 填远程 <span class="code-inline">hermes serve</span> 地址（VPS、家里的小机器、Tailscale 网内的 Mac mini），Agent 跑在远程、你在本地聊</li>
+    <li><strong>Hermes Cloud</strong> — 登录一次即列出账号下的所有 Agent，无需粘贴 URL</li>
+    <li><strong>多网关注册表</strong> — 给每台机器起名（Homelab、Work laptop…），侧栏一键切换；令牌加密存在系统钥匙串里</li>
+  </ul>
+
+  <h3>其他值得一逛的</h3>
+  <ul class="plain">
+    <li><strong>Appearance</strong> — 主题（含从 VS Code Marketplace 实时搜主题下载转换）、终端字体（Nerd Fonts 如 <span class="code-inline">MesloLGS NF</span> 可正确渲染图标）</li>
+    <li><strong>Advanced → Keep computer awake</strong> — 长任务跑着不让机器睡眠</li>
+    <li><strong>Keyboard Shortcuts</strong>（<kbd>Cmd/Ctrl+/</kbd>）— 全部快捷键可自定义，冲突会被标出</li>
+    <li><strong>Plugins</strong> — 管理桌面端插件（单个 ESM 文件即装即热载）与后端 Agent 插件</li>
+  </ul>
+
+  <div class="card blue">
+    <h4>多 Profile 的「Applies to」作用域</h4>
+    <p>配置型设置页（Model、Workspace、Safety、Memory &amp; Context 等）顶部有一排 Profile 芯片：不用切换整个应用，就能直接查看/修改<strong>另一个 Profile</strong> 的设置——多实例用户防串台的保险。</p>
+  </div>
+</section>
+
+<!-- ================= 09 ================= -->
+<section id="s9">
+  <h2 class="sec"><span class="idx">09</span>快捷键速查表</h2>
+  <p class="lead">Mac 用 <kbd>Cmd</kbd>，Windows/Linux 用 <kbd>Ctrl</kbd>。全部可在设置里改键。</p>
+
+  <div class="tbl-scroll">
+  <table>
+    <tr><th>分类</th><th>快捷键</th><th>功能</th></tr>
+    <tr><td rowspan="3">全局入口</td><td><kbd>Cmd/Ctrl+K</kbd> 或 <kbd>Cmd/Ctrl+P</kbd></td><td>命令面板（跳转一切）</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+,</kbd></td><td>设置</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+/</kbd></td><td>快捷键面板</td></tr>
+    <tr><td rowspan="7">会话与窗口</td><td><kbd>Cmd/Ctrl+N</kbd></td><td>新会话</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+T</kbd> / <kbd>Cmd/Ctrl+W</kbd></td><td>新标签 / 关标签</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+Shift+T</kbd></td><td>恢复刚关的标签</td></tr>
+    <tr><td><kbd>Ctrl+Tab</kbd> / <kbd>Ctrl+Shift+Tab</kbd></td><td>会话间轮换</td></tr>
+    <tr><td><kbd>Ctrl+1…9</kbd></td><td>跳到第 N 个最近会话</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+Shift+N</kbd></td><td>新窗口</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+Shift+F</kbd></td><td>跨会话搜索</td></tr>
+    <tr><td rowspan="3">界面布局</td><td><kbd>Cmd/Ctrl+B</kbd> / <kbd>Cmd/Ctrl+J</kbd></td><td>左栏 / 右栏开关</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+\</kbd></td><td>左右栏互换位置</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+Shift+S</kbd></td><td>状态栏开关</td></tr>
+    <tr><td rowspan="2">查找</td><td><kbd>Cmd/Ctrl+F</kbd></td><td>页内查找聊天记录</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+G</kbd> / <kbd>Cmd/Ctrl+Shift+G</kbd></td><td>查找时逐个跳匹配</td></tr>
+    <tr><td rowspan="4">终端</td><td><kbd>Ctrl+`</kbd></td><td>显示终端</td></tr>
+    <tr><td><kbd>Ctrl+Shift+`</kbd></td><td>再开一个终端</td></tr>
+    <tr><td><kbd>Ctrl+Shift+↓/↑</kbd></td><td>终端间切换</td></tr>
+    <tr><td><kbd>Ctrl+Shift+W</kbd></td><td>关闭当前终端</td></tr>
+    <tr><td>Git</td><td><kbd>Cmd/Ctrl+G</kbd> / <kbd>Cmd/Ctrl+Shift+B</kbd></td><td>审查面板 / 新建 worktree</td></tr>
+    <tr><td rowspan="2">HUD / Quick Entry</td><td><kbd>Cmd/Ctrl+Shift+H</kbd></td><td>HUD 悬浮模式开关</td></tr>
+    <tr><td><kbd>Cmd/Ctrl+Shift+Space</kbd></td><td>Quick Entry 全局呼出（默认）</td></tr>
+    <tr><td>输入框</td><td><kbd>↑</kbd> / <kbd>↓</kbd>（空输入框）</td><td>召回历史 prompt</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ================= 10 ================= -->
+<section id="s10">
+  <h2 class="sec"><span class="idx">10</span>排错与恢复</h2>
+
+  <h3>看懂错误卡片：按层定位</h3>
+  <p>回合失败时，聊天里会出现一张<strong>点名失败层</strong>的错误卡片：供应商/模型、自定义端点、流式连接、认证、计费、网关、本地运行时、磁盘——一眼知道是哪家的问题。卡片附带动作：</p>
+  <ul class="plain">
+    <li><strong>Retry</strong> — 重跑失败回合</li>
+    <li><strong>Switch provider</strong> — 直达 Settings → Models</li>
+    <li><strong>Open logs</strong> — 打开 <span class="code-inline">~/.hermes/logs</span></li>
+    <li><strong>Send diagnostics</strong> — 上传脱敏诊断包给官方（显式确认后才发，密钥全程脱敏，14 天自动删除）</li>
+    <li><strong>Copy error details</strong> — 复制纯文本错误摘要</li>
+  </ul>
+
+  <h3>高频问题速查</h3>
+  <div class="tbl-scroll">
+  <table>
+    <tr><th>症状</th><th>可能原因</th><th>解法</th></tr>
+    <tr><td>能打开但回复空白/破碎</td><td>供应商认证或模型选择错了</td><td>Settings → Providers 重配；确认模型与密钥匹配</td></tr>
+    <tr><td>App 完全启动失败</td><td>运行时/venv 损坏</td><td>看 <span class="code-inline">~/.hermes/logs/desktop.log</span>；重建 venv：<span class="code-inline">rm -rf ~/.hermes/hermes-agent/venv</span> 后重启</td></tr>
+    <tr><td>想重走首次引导</td><td>—</td><td><span class="code-inline">rm ~/.hermes/hermes-agent/.hermes-bootstrap-complete</span> 再启动</td></tr>
+    <tr><td>macOS 麦克风权限卡死</td><td>TCC 授权状态异常</td><td><span class="code-inline">tccutil reset Microphone com.nousresearch.hermes</span>，重启 App 重新授权</td></tr>
+    <tr><td>远程连接 401 / Invalid credentials</td><td>账号密码不匹配或认证门未启用</td><td>核对 <span class="code-inline">~/.hermes/.env</span>；<span class="code-inline">curl -s http://&lt;host&gt;:9119/api/status</span> 应报 <span class="code-inline">auth_required:true</span></td></tr>
+    <tr><td>每次重启都被登出（远程）</td><td>缺稳定签名密钥</td><td>在远端 <span class="code-inline">.env</span> 设 <span class="code-inline">HERMES_DASHBOARD_BASIC_AUTH_SECRET</span></td></tr>
+    <tr><td>自建/构建时卡在 Electron 下载</td><td>GitHub 被墙/限速</td><td>安装器会自动换 npmmirror 镜像重试；也可自设 <span class="code-inline">ELECTRON_MIRROR</span></td></tr>
+  </table>
+  </div>
+
+  <h3>官方恢复套路（按顺序来）</h3>
+  <div class="codeblock"><span class="lang">TERMINAL</span><button class="copy">复制</button><pre><span class="prompt-line">$</span> hermes doctor          # 1. 体检：配置哪里坏了
+<span class="prompt-line">$</span> hermes model            # 2. 重确认供应商/模型/认证
+<span class="prompt-line">$</span> hermes setup            # 3. 重跑设置向导
+<span class="prompt-line">$</span> hermes sessions list    # 4. 确认会话都在
+<span class="prompt-line">$</span> hermes --continue       # 5. 续上最近会话
+<span class="prompt-line">$</span> hermes gateway status   # 6. 网关状态（如用到）</pre></div>
+  <p style="font-size:14px;color:var(--ink-3)">这套顺序能把「玄学坏了」拉回已知状态。</p>
+
+  <h3>更新与卸载</h3>
+  <ul class="plain">
+    <li><strong>更新</strong>：后台自动检查，就绪后一键更新；多目标时（本地后端 + 桌面端）About 面板的 <strong>Update now</strong> 会按「后端先、桌面端最后」的顺序全部更完</li>
+    <li><strong>卸载</strong>：<strong>Settings → About → Danger zone</strong> 三档——①只卸聊天 GUI（Agent、配置、会话保留）②卸 GUI + Agent（保留用户数据）③全部卸载。终端等价：<span class="code-inline">hermes uninstall --gui</span> / <span class="code-inline">hermes uninstall</span> / <span class="code-inline">hermes uninstall --full</span></li>
+  </ul>
+</section>
+
+<!-- ================= 11 ================= -->
+<section id="s11">
+  <h2 class="sec"><span class="idx">11</span>学习路径</h2>
+  <p class="lead">跑完本教程后，按需深入（全部为官方文档地址）：</p>
+  <table>
+    <tr><th>想学什么</th><th>去哪</th></tr>
+    <tr><td>终端界面与斜杠命令全表</td><td><span class="code-inline">docs/user-guide/cli</span> 与 <span class="code-inline">docs/user-guide/tui</span></td></tr>
+    <tr><td>把 Hermes 接入 Telegram / 飞书 / 微信</td><td><span class="code-inline">docs/user-guide/messaging</span></td></tr>
+    <tr><td>Bot Mode 深度玩法（多 Bot 协作）</td><td><span class="code-inline">docs/user-guide/bot-mode</span></td></tr>
+    <tr><td>技能系统：让 Hermes 学新流程</td><td><span class="code-inline">docs/user-guide/features/skills</span></td></tr>
+    <tr><td>Desktop 连接多台 Hermes 实例</td><td><span class="code-inline">docs/user-guide/multi-connection-desktop</span></td></tr>
+    <tr><td>桌面端插件开发</td><td><span class="code-inline">docs/developer-guide/desktop-plugin-sdk</span></td></tr>
+    <tr><td>换机迁移（整设置打包搬走）</td><td><span class="code-inline">hermes backup</span></td></tr>
+  </table>
+
+  <div class="card gold">
+    <h4>🎓 结业自测：能做到这些就算出师</h4>
+    <ul class="plain" style="margin-bottom:0">
+      <li>☑ 开一场新会话，换模型，拖一个文件进去提问</li>
+      <li>☑ 让 Agent 干一件需要工具的活，并在右侧预览轨看到结果</li>
+      <li>☑ 用 <kbd>Cmd/Ctrl+G</kbd> 审查 Agent 改动的 diff 并生成 commit message</li>
+      <li>☑ 聊天里输入 <span class="code-inline">/journey</span>，看看它这周学会了什么</li>
+      <li>☑ 在 Skills 面板装一个新技能并启用</li>
+    </ul>
+  </div>
+</section>
+
+<div class="src-note">
+  <b>信息来源</b>：Hermes Agent 官方文档 <b>hermes-agent.nousresearch.com</b>（Desktop App 用户指南 · Quickstart 教程 · Web Dashboard 指南），抓取核验时点 <b>2026-08-23</b>。界面名称、快捷键、命令以官方文档为准；实际 UI 可能随版本迭代，以应用内 <kbd>Cmd/Ctrl+/</kbd> 快捷键面板显示为最终依据。<br><br>
+  <b>免责声明</b>：本教程为社区性质的使用指导，与 Nous Research 无隶属关系；文中提及的第三方服务与价格以官方页面实时信息为准。
+</div>
+
+<footer>Hermes Desktop 入门使用教程 · 2026-08-23 · 配套《Hermes 一键安装指南》</footer>
+</div>
+
+<script>
+(function(){
+  function bindCopy(){
+    document.querySelectorAll('.codeblock .copy').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var block = btn.closest('.codeblock');
+        var pre = block ? block.querySelector('pre') : null;
+        if(!pre) return;
+        var text = pre.innerText;
+        function done(){
+          btn.textContent = '已复制';
+          btn.classList.add('done');
+          setTimeout(function(){ btn.textContent = '复制'; btn.classList.remove('done'); }, 1600);
+        }
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done).catch(function(){ fallback(); });
+        } else { fallback(); }
+        function fallback(){
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try{ document.execCommand('copy'); done(); }catch(e){}
+          document.body.removeChild(ta);
+        }
+      });
+    });
+  }
+  bindCopy();
+})();
+</script>
+</body>
+</html>
