@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes Agent 一键安装指导教程</title>
+<style>
+  :root {
+    --titan-black: #1C1C1E;
+    --silver: #A1A1AA;
+    --silver-light: #E4E4E7;
+    --warm-gold: #F59E0B;
+    --warm-gold-light: #FEF3C7;
+    --bg: #F6F8FA;
+    --card: #FFFFFF;
+    --text: #18181B;
+    --text-secondary: #52525B;
+    --border: #E4E4E7;
+    --code-bg: #1C1C1E;
+    --code-text: #E4E4E7;
+    --green: #16A34A;
+    --red: #DC2626;
+    --blue: #2563EB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #1C1C1E 0%, #27272A 60%, #3F3F46 100%);
+    color: #fff;
+    padding: 48px 20px 40px;
+    text-align: center;
+  }
+  header .logo { font-size: 40px; margin-bottom: 8px; }
+  header h1 { font-size: 28px; font-weight: 700; letter-spacing: 0.5px; }
+  header h1 .gold { color: var(--warm-gold); }
+  header .subtitle { color: var(--silver); margin-top: 10px; font-size: 15px; }
+  header .meta { margin-top: 16px; font-size: 12px; color: #71717A; }
+  header .meta span { margin: 0 10px; }
+
+  /* Section */
+  section { margin-top: 36px; }
+  h2 {
+    font-size: 20px; font-weight: 700; color: var(--titan-black);
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 6px;
+  }
+  h2 .num {
+    background: var(--titan-black); color: var(--warm-gold);
+    width: 28px; height: 28px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .section-desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; padding-left: 38px; }
+  h3 { font-size: 16px; font-weight: 600; color: var(--titan-black); margin: 22px 0 10px; }
+  h3 .tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; vertical-align: 2px; margin-left: 8px; }
+  .tag-rec { background: var(--warm-gold-light); color: #92400E; }
+  .tag-beta { background: #FEE2E2; color: #991B1B; }
+  .tag-stable { background: #DCFCE7; color: #166534; }
+
+  /* Card */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 22px; margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  /* Code block */
+  .code-block {
+    position: relative; background: var(--code-bg);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  .code-block .label {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; font-size: 11px; color: #71717A;
+    border-bottom: 1px solid #3F3F46;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .code-block pre {
+    padding: 14px 16px; overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px; color: var(--code-text); line-height: 1.6;
+  }
+  .code-block pre .cmd { color: var(--warm-gold); }
+  .code-block pre .cmt { color: #71717A; }
+  .copy-btn {
+    background: #3F3F46; color: #D4D4D8; border: none; border-radius: 6px;
+    padding: 4px 10px; font-size: 11px; cursor: pointer;
+    font-family: inherit; transition: background 0.15s;
+  }
+  .copy-btn:hover { background: #52525B; }
+  .copy-btn.done { background: var(--green); color: #fff; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+  th {
+    background: #FAFAFA; text-align: left; padding: 10px 12px;
+    border-bottom: 2px solid var(--border); font-weight: 600; color: var(--titan-black);
+    white-space: nowrap;
+  }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td code, p code, li code {
+    background: #F4F4F5; border: 1px solid var(--border); border-radius: 4px;
+    padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px; color: var(--titan-black);
+  }
+  th code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+
+  /* Callout */
+  .callout {
+    border-radius: 10px; padding: 14px 16px; margin: 14px 0;
+    font-size: 13.5px; display: flex; gap: 10px;
+  }
+  .callout .icon { font-size: 16px; flex-shrink: 0; line-height: 1.6; }
+  .callout-info { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E3A8A; }
+  .callout-warn { background: var(--warm-gold-light); border: 1px solid #FDE68A; color: #78350F; }
+  .callout-danger { background: #FEF2F2; border: 1px solid #FECACA; color: #7F1D1D; }
+  .callout a { color: inherit; font-weight: 600; }
+
+  /* Decision cards */
+  .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  .decision-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .decision-card h4 { font-size: 15px; color: var(--titan-black); margin-bottom: 8px; }
+  .decision-card .who { font-size: 12px; color: var(--warm-gold); font-weight: 600; margin-bottom: 8px; }
+  .decision-card ul { list-style: none; }
+  .decision-card li { font-size: 13px; color: var(--text-secondary); padding: 3px 0 3px 18px; position: relative; }
+  .decision-card li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+
+  /* Steps */
+  .step { display: flex; gap: 14px; margin: 18px 0; }
+  .step-num {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--warm-gold); color: #fff; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .step-body { flex: 1; }
+  .step-body .step-title { font-weight: 600; color: var(--titan-black); margin-bottom: 4px; font-size: 14.5px; }
+  .step-body p, .step-body ul { font-size: 13.5px; color: var(--text-secondary); }
+  .step-body ul { padding-left: 18px; margin: 4px 0; }
+
+  /* Download buttons */
+  .dl-group { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+  .dl-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--titan-black); color: #fff; text-decoration: none;
+    padding: 10px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
+    transition: opacity 0.15s;
+  }
+  .dl-btn:hover { opacity: 0.85; }
+  .dl-btn.gold { background: var(--warm-gold); color: #1C1C1E; }
+
+  /* Footer */
+  footer {
+    margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--silver);
+  }
+  footer p { margin: 4px 0; }
+
+  .status-ok { color: var(--green); font-weight: 600; }
+  .status-warn { color: var(--warm-gold); font-weight: 600; }
+  .status-beta { color: var(--red); font-weight: 600; }
+
+  @media (max-width: 640px) {
+    .decision-grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 22px; }
+    .section-desc { padding-left: 0; }
+    table { font-size: 12.5px; }
+    th, td { padding: 8px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">☤</div>
+  <h1>Hermes Agent <span class="gold">一键安装指导教程</span></h1>
+  <div class="subtitle">Hermes Desktop 桌面版 · Hermes CLI 命令行版 · 两种方式 2 分钟装好</div>
+  <div class="meta">
+    <span>📦 开源协议 MIT</span>
+    <span>🏗️ 由 Nous Research 构建</span>
+    <span>📅 2026-08-23 整理</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ============ 简介 ============ -->
+  <section>
+    <h2><span class="num">0</span>开始之前</h2>
+    <div class="section-desc">30 秒了解 Hermes 是什么、该选哪条安装路线。</div>
+    <div class="card">
+      <p style="font-size:14px; color:var(--text-secondary);">
+        <strong style="color:var(--titan-black);">Hermes Agent</strong> 是 Nous Research 出品的开源自进化 AI 代理（MIT 协议）——内置学习闭环：从经验中自动创建技能、持久化记忆、搜索过往对话，支持 Telegram / Discord / Slack / WhatsApp / Signal / CLI 多入口，40+ 工具，可接入 300+ 模型（Nous Portal、OpenRouter、OpenAI、Kimi、GLM、MiniMax 等）。</p>
+      <p style="font-size:14px; color:var(--text-secondary); margin-top:8px;">官方提供 <strong style="color:var(--titan-black);">两种安装入口</strong>，本教程各给一条"一键"路径：</p>
+      <div class="decision-grid">
+        <div class="decision-card">
+          <h4>🖥️ 方式一：Hermes Desktop</h4>
+          <div class="who">适合：不想碰终端、偏好图形界面的用户</div>
+          <ul>
+            <li>官网下载 DMG / EXE 安装包，双击即装</li>
+            <li>会同时装好桌面端 + 命令行（CLI）</li>
+            <li>支持 macOS 12+ 与 Windows 10/11</li>
+            <li>Linux 无独立桌面安装包（走方式二）</li>
+          </ul>
+        </div>
+        <div class="decision-card">
+          <h4>⌨️ 方式二：Hermes CLI</h4>
+          <div class="who">适合：开发者 / Linux 服务器 / 追求可控</div>
+          <ul>
+            <li>一行命令完成全部依赖 + 主程序安装</li>
+            <li>Linux / macOS / WSL2 / Termux 全支持</li>
+            <li>装完随时可用 <code>hermes desktop</code> 补装桌面端</li>
+            <li>Windows 原生支持为 Beta，可选 WSL2</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout callout-info">
+        <span class="icon">💡</span>
+        <div><strong>先想清楚网络环境再选路线：</strong>Hermes 安装器需要从 GitHub 克隆仓库。国内网络访问 GitHub 不稳时，桌面安装包可能因下载依赖超时而失败——此时建议<strong>先走方式二（CLI 命令行安装，可挂代理重试），装好后运行 <code>hermes desktop</code> 再补装桌面端</strong>，成功率最高。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 方式一：Desktop ============ -->
+  <section>
+    <h2><span class="num">1</span>方式一：直接安装 Hermes Desktop</h2>
+    <div class="section-desc">从官网下载图形界面安装包，双击运行，安装器会自动装好桌面端和命令行环境。</div>
+
+    <div class="card">
+      <h3>1.1 macOS（12+）<span class="tag tag-stable">稳定</span></h3>
+      <div class="dl-group">
+        <a class="dl-btn gold" href="https://hermes-assets.nousresearch.com/Hermes-Setup.dmg" target="_blank">⬇️ 下载 macOS DMG 安装包</a>
+        <a class="dl-btn" href="https://hermes-agent.nousresearch.com/" target="_blank">🌐 官网下载页</a>
+      </div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">下载并打开 DMG</div>
+          <p>下载 <code>Hermes-Setup.dmg</code> 后双击挂载，将 Hermes 拖入「应用程序」文件夹。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">首次启动</div>
+          <p>首次打开若提示"无法验证开发者"，前往 <code>系统设置 → 隐私与安全性</code>，点「仍要打开」。启动后安装器会自动完成依赖安装（Python、Node.js 等）与初始化。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">完成初始配置</div>
+          <p>在桌面端引导界面选择模型提供商（推荐 Nous Portal 一键配置），完成后即可开始对话。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>1.2 Windows（10/11）<span class="tag tag-stable">稳定</span></h3>
+      <div class="dl-group">
+        <a class="dl-btn gold" href="https://hermes-assets.nousresearch.com/Hermes-Setup.exe" target="_blank">⬇️ 下载 Windows EXE 安装包</a>
+      </div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">下载并运行安装器</div>
+          <p>下载 <code>Hermes-Setup.exe</code>，双击运行，按提示完成安装。SmartScreen 拦截时点「更多信息 → 仍要运行」。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">启动并配置</div>
+          <p>安装器同样会装好命令行环境，桌面端启动后按引导选择模型提供商即可。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>1.3 Linux</h3>
+      <p style="font-size:13.5px; color:var(--text-secondary);">Linux <strong>没有独立的桌面安装包</strong>——官方推荐先通过终端安装 CLI（见方式二），再运行一条命令补装桌面端：</p>
+      <div class="code-block">
+        <div class="label"><span>bash · Linux</span><button class="copy-btn">复制</button></div>
+        <pre><span class="cmt"># 先完成方式二的 CLI 安装，然后：</span>
+<span class="cmd">hermes desktop</span>    <span class="cmt"># 自动安装并启动 Hermes Desktop</span></pre>
+      </div>
+      <div class="callout callout-warn">
+        <span class="icon">⚠️</span>
+        <div>Linux 桌面端需要编译原生模块，请先确保安装了 <code>g++</code>（Debian/Ubuntu：<code>sudo apt install build-essential</code>）。</div>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="icon">🔗</span>
+      <div><strong>Desktop 与 CLI 是什么关系？</strong>两者共享同一个代理核心和记忆（同一 <code>~/.hermes/</code> 数据目录）。桌面版 = 图形壳 + 内置 CLI；只用 CLI 也完全够用。任何时候都可以用 <code>hermes desktop</code> 在 CLI 之上补装桌面端。</div>
+    </div>
+  </section>
+
+  <!-- ============ 方式二：CLI ============ -->
+  <section>
+    <h2><span class="num">2</span>方式二：直接安装 Hermes CLI</h2>
+    <div class="section-desc">一行命令搞定：依赖（Python / Node.js / ripgrep / ffmpeg）+ 仓库 + 虚拟环境 + 全局 hermes 命令，全自动。</div>
+
+    <div class="card">
+      <h3>2.0 安装前置检查（1 分钟）</h3>
+      <p style="font-size:13.5px; color:var(--text-secondary); margin-bottom:8px;">CLI 安装器唯一的硬性前置是 <strong style="color:var(--titan-black);">Git</strong>，其余依赖安装器会自动处理：</p>
+      <table>
+        <thead>
+          <tr><th>平台</th><th>前置条件</th><th>检查 / 安装命令</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>macOS</strong></td>
+            <td>Git（Xcode CLT 会自动带）</td>
+            <td><code>git --version</code></td>
+          </tr>
+          <tr>
+            <td><strong>Linux</strong></td>
+            <td>Git + curl + xz-utils<br><span style="font-size:12px; color:var(--silver);">（安装器以 .tar.xz 下载 Node.js）</span></td>
+            <td><code>sudo apt install git curl xz-utils</code><br><span style="font-size:12px; color:var(--silver);">Debian/Ubuntu 示例；用桌面端再加 build-essential</span></td>
+          </tr>
+          <tr>
+            <td><strong>Windows</strong></td>
+            <td>PowerShell（原生 Beta）<br>或 WSL2（推荐）</td>
+            <td><code>wsl --install</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout callout-info">
+        <span class="icon">ℹ️</span>
+        <div>Python、Node.js v22、ripgrep、ffmpeg、uv <strong>都不需要手动装</strong>——安装器检测到缺失会自动安装，全程无需 sudo（普通用户安装模式）。</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>2.1 Linux / macOS / WSL2<span class="tag tag-rec">推荐主路径</span></h3>
+      <p style="font-size:13.5px; color:var(--text-secondary);">终端里执行一行命令：</p>
+      <div class="code-block">
+        <div class="label"><span>bash / zsh · Linux · macOS · WSL2 · Termux</span><button class="copy-btn">复制</button></div>
+        <pre><span class="cmd">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</span></pre>
+      </div>
+      <p style="font-size:13px; color:var(--silver);">等价备用源（直连 GitHub raw，与上面二选一）：</p>
+      <div class="code-block">
+        <div class="label"><span>bash · 备用</span><button class="copy-btn">复制</button></div>
+        <pre><span class="cmd">curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash</span></pre>
+      </div>
+
+      <h3 style="margin-top:18px;">安装完成后，重载 shell 即可启动</h3>
+      <div class="code-block">
+        <div class="label"><span>bash / zsh</span><button class="copy-btn">复制</button></div>
+        <pre><span class="cmd">source ~/.bashrc</span>    <span class="cmt"># zsh 用户: source ~/.zshrc</span>
+<span class="cmd">hermes</span>                <span class="cmt"># 启动 TUI，开始对话</span></pre>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="icon">🌐</span>
+        <div><strong>国内网络提示：</strong>安装过程需克隆 GitHub 仓库并下载依赖，若超时失败，先为终端挂上代理再重跑安装命令，例如 <code>export https_proxy=http://127.0.0.1:7890</code>（端口换成自己的），或改用方式一在可直连的网络环境下安装。</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>2.2 Windows 原生（PowerShell）<span class="tag tag-beta">Early Beta</span></h3>
+      <p style="font-size:13.5px; color:var(--text-secondary);">v0.14 起原生支持 Windows，PowerShell 中执行：</p>
+      <div class="code-block">
+        <div class="label"><span>powershell · Windows 10/11</span><button class="copy-btn">复制</button></div>
+        <pre><span class="cmd">iex (irm https://hermes-agent.nousresearch.com/install.ps1)</span></pre>
+      </div>
+      <div class="callout callout-warn">
+        <span class="icon">⚠️</span>
+        <div><strong>生产环境建议走 WSL2：</strong>原生 Windows 路径仍在 Beta。更稳的方案是在 PowerShell（管理员）中运行 <code>wsl --install</code> 装 WSL2，然后在 WSL2 的 Linux 终端里执行 2.1 的 curl 命令——体验与原生 Linux 完全一致。低版本 PowerShell 可能出现安装输出乱码，建议先升级 PowerShell。</div>
+      </div>
+      <p style="font-size:13px; color:var(--silver);">另注：v0.14 起 Hermes 已发布 PyPI 包，已有可控 Python 环境的用户也可 <code>pip install hermes-agent</code>。</p>
+    </div>
+
+    <div class="card">
+      <h3>2.3 安装器把东西装到了哪</h3>
+      <table>
+        <thead>
+          <tr><th>安装模式</th><th>代码位置</th><th>hermes 命令</th><th>数据目录</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>普通用户</strong>（默认）</td>
+            <td><code>~/.hermes/hermes-agent/</code></td>
+            <td><code>~/.local/bin/hermes</code>（符号链接）</td>
+            <td><code>~/.hermes/</code></td>
+          </tr>
+          <tr>
+            <td><strong>Root 模式</strong>（sudo 安装）</td>
+            <td><code>/usr/local/lib/hermes-agent/</code></td>
+            <td><code>/usr/local/bin/hermes</code></td>
+            <td><code>/root/.hermes/</code> 或 <code>$HERMES_HOME</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:12.5px; color:var(--silver);">Root 模式为多用户共享机器场景（一台机器一份安装，所有用户可用）；个人使用无需 sudo，默认普通用户模式即可。用户级配置（密钥、技能、会话）始终在各用户自己的 <code>~/.hermes/</code> 下。</p>
+      <div class="callout callout-info">
+        <span class="icon">🖥️</span>
+        <div>CLI 装完想补桌面端？一条命令：<code>hermes desktop</code>。服务器无桌面环境可跳过。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 安装后配置 ============ -->
+  <section>
+    <h2><span class="num">3</span>安装后配置（两条路线通用）</h2>
+    <div class="section-desc">装好 ≠ 能用，还需配置模型提供商。最快 1 条命令，最全走设置向导。</div>
+
+    <div class="card">
+      <h3>3.1 最快路径：Nous Portal 一键配置<span class="tag tag-rec">推荐</span></h3>
+      <div class="code-block">
+        <div class="label"><span>bash</span><button class="copy-btn">复制</button></div>
+        <pre><span class="cmd">hermes setup --portal</span></pre>
+      </div>
+      <p style="font-size:13.5px; color:var(--text-secondary);">一条命令完成：OAuth 登录 → 设置 Nous 为提供商 → 开启 Tool Gateway（联网搜索、图片生成、TTS、云浏览器）。一个订阅覆盖 300+ 模型，无需逐个配置 API Key（订阅分 Free / Plus / Super / Ultra 多档）。</p>
+
+      <h3 style="margin-top:18px;">3.2 完整设置向导（自带 API Key 的用户）</h3>
+      <div class="code-block">
+        <div class="label"><span>bash</span><button class="copy-btn">复制</button></div>
+        <pre><span class="cmd">hermes setup</span>          <span class="cmt"># 交互式向导，逐步配置模型/工具/密钥</span>
+<span class="cmt"># 或按需单独配置：</span>
+<span class="cmd">hermes model</span>          <span class="cmt"># 交互式选择模型和提供商（OpenRouter/OpenAI/Kimi/GLM/MiniMax…）</span>
+<span class="cmd">hermes tools</span>          <span class="cmt"># 配置启用的工具</span>
+<span class="cmd">hermes gateway setup</span>  <span class="cmt"># 接入 Telegram/Discord/Slack 等消息平台</span></pre>
+      </div>
+      <p style="font-size:13px; color:var(--silver);">API Key 存储在本地 <code>~/.hermes/</code> 配置中；从 OpenClaw 迁移可运行 <code>hermes claw migrate</code> 自动导入设置、记忆、技能和密钥。</p>
+
+      <h3 style="margin-top:18px;">3.3 常用命令速查</h3>
+      <table>
+        <thead>
+          <tr><th>命令</th><th>作用</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>hermes</code></td><td>启动终端 TUI，开始对话</td></tr>
+          <tr><td><code>hermes desktop</code></td><td>安装并启动桌面端</td></tr>
+          <tr><td><code>hermes doctor</code></td><td>自检诊断，缺什么、怎么修一目了然</td></tr>
+          <tr><td><code>hermes update</code></td><td>更新到最新版本（自动识别安装方式）</td></tr>
+          <tr><td><code>/skills</code>、<code>/model</code>、<code>/usage</code></td><td>对话内斜杠命令：浏览技能 / 换模型 / 查用量</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 排错 ============ -->
+  <section>
+    <h2><span class="num">4</span>常见问题排查</h2>
+    <div class="section-desc">先跑 <code>hermes doctor</code>，90% 的问题它会直接告诉你答案。</div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th style="width:38%">症状</th><th>解法</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>hermes: command not found</code></td>
+            <td>重载 shell（<code>source ~/.bashrc</code> 或 <code>~/.zshrc</code>）；仍不行则检查 PATH 是否包含 <code>~/.local/bin</code>：<br><code>export PATH="$HOME/.local/bin:$PATH"</code></td>
+          </tr>
+          <tr>
+            <td>安装卡在 GitHub 克隆 / 下载超时</td>
+            <td>国内网络问题。为终端挂代理后重跑安装命令（<code>export https_proxy=…</code>），或切换网络环境</td>
+          </tr>
+          <tr>
+            <td><code>API key not set</code></td>
+            <td>运行 <code>hermes model</code> 配置提供商，或 <code>hermes config set OPENROUTER_API_KEY your_key</code></td>
+          </tr>
+          <tr>
+            <td>更新后配置丢失</td>
+            <td><code>hermes config check</code> → <code>hermes config migrate</code></td>
+          </tr>
+          <tr>
+            <td>Windows 原生安装输出乱码</td>
+            <td>升级 PowerShell 到新版本；或改用 WSL2 安装（见 2.2）</td>
+          </tr>
+          <tr>
+            <td><code>ModuleNotFoundError: No module named 'dotenv'</code></td>
+            <td>调用了仓库源码而非 venv 启动器——确认执行的是 <code>~/.hermes/hermes-agent/venv/bin/hermes</code>，运行 <code>hermes doctor</code> 确认</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 总结 ============ -->
+  <section>
+    <h2><span class="num">5</span>一张图记住两条路</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th></th><th>方式一 Desktop</th><th>方式二 CLI</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>macOS 12+</strong></td>
+              <td class="status-ok">✅ DMG 双击安装</td>
+              <td class="status-ok">✅ curl 一行命令</td></tr>
+          <tr><td><strong>Windows 10/11</strong></td>
+              <td class="status-ok">✅ EXE 双击安装</td>
+              <td class="status-beta">⚠️ 原生 Beta / 推荐 WSL2</td></tr>
+          <tr><td><strong>Linux</strong></td>
+              <td class="status-warn">➖ 无独立包，CLI 装后 <code>hermes desktop</code></td>
+              <td class="status-ok">✅ curl 一行命令（主路径）</td></tr>
+          <tr><td><strong>装完桌面端？</strong></td>
+              <td class="status-ok">✅ 自带</td>
+              <td><code>hermes desktop</code> 一条命令补装</td></tr>
+          <tr><td><strong>核心 / 记忆</strong></td>
+              <td colspan="2" style="text-align:center; color:var(--text-secondary);">完全相同——同一个代理核心，同一份 <code>~/.hermes/</code> 数据</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-danger">
+      <span class="icon">🔒</span>
+      <div><strong>安全习惯：</strong><code>curl | bash</code> 会远程执行脚本，动手前可先下载脚本审阅：<code>curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o install.sh</code>，确认无误再执行。介意者可从 GitHub 仓库源码安装（官方 Contributing 指南）。</div>
+    </div>
+  </section>
+
+  <footer>
+    <p>信息来源：Hermes Agent 官方文档 <a href="https://hermes-agent.nousresearch.com/docs/getting-started/installation" style="color:var(--warm-gold);">Installation Guide</a> · <a href="https://hermes-agent.nousresearch.com/" style="color:var(--warm-gold);">官网下载页</a> · GitHub <a href="https://github.com/NousResearch/hermes-agent" style="color:var(--warm-gold);">NousResearch/hermes-agent</a>（MIT）</p>
+    <p>整理日期：2026-08-23 · 以官方文档为准，安装命令可能随版本更新，执行前建议核对官网最新说明。</p>
+  </footer>
+
+</div>
+
+<script>
+  // 复制按钮
+  document.querySelectorAll('.copy-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var pre = btn.closest('.code-block').querySelector('pre');
+      var text = pre.innerText;
+      function onSuccess() {
+        var old = btn.textContent;
+        btn.textContent = '已复制 ✓';
+        btn.classList.add('done');
+        setTimeout(function() { btn.textContent = old; btn.classList.remove('done'); }, 1600);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(onSuccess);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); onSuccess(); } catch(e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
