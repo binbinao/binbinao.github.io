@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>腾讯会议工作台 · 把会议数据变成一张看得懂的工作台</title>
+<meta name="description" content="零依赖单文件前端 + 本地桥接服务，把腾讯会议的真实数据变成月度日历热力图、每日会议、统计与预约工作台。本站为公开演示页。">
+<style>
+  :root{
+    --ink:#1C1C1E; --silver:#A1A1AA; --gold:#F59E0B;
+    --bg:#F6F7F9; --line:#E7E8EC; --muted:#52525B; --soft:#FAFAFB;
+    --radius:16px;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+  /* Header */
+  .site-header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .header-inner{height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .brand{display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .brand-name{font-size:15px;font-weight:700;letter-spacing:.02em}
+  .nav{display:flex;align-items:center;gap:28px}
+  .nav a.link{font-size:14px;color:var(--muted);transition:color .2s}
+  .nav a.link:hover{color:var(--ink)}
+  .btn-gh{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:9px;background:var(--ink);color:#fff;font-size:13px;font-weight:600;transition:transform .2s,box-shadow .2s}
+  .btn-gh:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(28,28,30,.18)}
+
+  /* Hero */
+  .hero{background:linear-gradient(115deg,#F2F5FF 0%,#FFF8EE 52%,#F6F7F9 100%);border-bottom:1px solid var(--line)}
+  .hero-inner{padding:72px 0 0}
+  .badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:var(--muted)}
+  .badge-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+  h1{margin:24px 0 0;font-size:clamp(34px,5vw,56px);line-height:1.24;letter-spacing:-.02em;font-weight:700}
+  .hero-sub{max-width:720px;margin:20px 0 0;font-size:17px;line-height:1.8;color:var(--muted)}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 26px;border-radius:10px;font-size:15px;font-weight:600;transition:transform .2s,box-shadow .2s,border-color .2s}
+  .btn-primary{background:var(--ink);color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(28,28,30,.18)}
+  .btn-secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn-secondary:hover{border-color:var(--silver)}
+  .hero-note{margin:16px 0 0;font-size:13px;color:var(--silver)}
+
+  /* Browser preview */
+  .browser{margin:48px 0 -56px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 24px 60px rgba(28,28,30,.10),0 4px 12px rgba(28,28,30,.04);position:relative;z-index:2}
+  .browser-bar{height:52px;display:flex;align-items:center;gap:12px;padding:0 20px;background:var(--soft);border-bottom:1px solid var(--line)}
+  .dots{display:flex;gap:6px;flex-shrink:0}
+  .dots i{width:9px;height:9px;border-radius:50%;display:block}
+  .dots i:nth-child(1){background:#FF9F8A}.dots i:nth-child(2){background:#FFD37A}.dots i:nth-child(3){background:#A8E6A3}
+  .browser-url{flex:1;text-align:center;font-size:12px;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#ECFDF3;color:#15803D;font-size:11px;font-weight:600;white-space:nowrap;flex-shrink:0}
+  .pill i{width:7px;height:7px;border-radius:50%;background:#16A34A;display:block}
+  .browser-body{display:grid;grid-template-columns:1fr 320px;gap:32px;padding:28px}
+  .section-label{margin:0 0 16px;font-size:15px;font-weight:600}
+  .heat{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;max-width:280px}
+  .heat span{aspect-ratio:1;border-radius:6px;background:#F1F1F3}
+  .heat .l1{background:#FDE9C8}.heat .l2{background:#F8CB80}.heat .l3{background:#F59E0B}
+  .heat-note{margin:14px 0 0;font-size:12px;color:var(--silver)}
+  .meeting-list{display:flex;flex-direction:column;gap:10px}
+  .meeting-row{padding:12px 14px;border:1px solid #EFEFF2;border-radius:10px;background:var(--soft);font-size:13px;color:#3F3F46}
+
+  /* Sections */
+  section.block{padding:88px 0}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;margin:0 0 12px}
+  h2{font-size:clamp(26px,3.2vw,36px);line-height:1.3;letter-spacing:-.01em;margin:0 0 14px}
+  .lead{max-width:680px;margin:0;color:var(--muted);font-size:16px;line-height:1.8}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px;transition:transform .2s,box-shadow .2s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(28,28,30,.07)}
+  .card-icon{width:40px;height:40px;border-radius:10px;background:#FFF6E6;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .card h3{margin:0 0 8px;font-size:17px}
+  .card p{margin:0;font-size:14px;color:var(--muted);line-height:1.75}
+
+  /* Notice */
+  .notice{padding:64px 0;background:var(--bg)}
+  .notice-box{display:flex;gap:20px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:24px 26px}
+  .notice-box svg{flex-shrink:0;margin-top:2px}
+  .notice-box h3{margin:0 0 8px;font-size:16px}
+  .notice-box p{margin:0;font-size:14px;color:var(--muted);line-height:1.8}
+
+  /* Compare table */
+  .compare{padding:8px 0 88px}
+  .table-wrap{overflow-x:auto;margin-top:32px;border:1px solid var(--line);border-radius:12px;background:#fff}
+  table{width:100%;border-collapse:collapse;min-width:640px;font-size:14px}
+  th,td{text-align:left;padding:16px 20px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--soft);font-weight:600;font-size:13px;color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+  td:first-child{font-weight:600;white-space:nowrap}
+
+  /* Steps */
+  .steps{background:var(--ink);color:#fff;padding:88px 0}
+  .steps h2{color:#fff}
+  .steps .lead{color:#B4B4BC}
+  .steps .eyebrow{color:var(--gold)}
+  .step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px}
+  .step{background:#252528;border:1px solid #35353A;border-radius:14px;padding:24px}
+  .step-no{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--gold)}
+  .step h3{margin:12px 0 8px;font-size:17px}
+  .step p{margin:0;font-size:14px;color:#B4B4BC;line-height:1.75}
+  .code-box{margin-top:32px;background:#131315;border:1px solid #35353A;border-radius:14px;overflow:hidden}
+  .code-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid #2C2C30}
+  .code-title{font-size:12px;color:#8A8A93}
+  .copy-btn{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border:1px solid #45454C;border-radius:8px;background:#222226;color:#E4E4E7;font-size:12px;cursor:pointer;font-family:var(--font);transition:background .2s,border-color .2s}
+  .copy-btn:hover{background:#2E2E33;border-color:#66666E}
+  pre{margin:0;padding:20px 18px;overflow-x:auto;font-size:13px;line-height:1.9;color:#D6D6DB}
+  pre .c{color:#7C7C86}
+  pre .k{color:var(--gold)}
+  .sources{margin-top:36px;display:flex;flex-wrap:wrap;gap:10px}
+  .sources a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid #3A3A40;border-radius:9px;font-size:13px;color:#D6D6DB;transition:border-color .2s,background .2s}
+  .sources a:hover{border-color:var(--gold);background:#2A2A2E}
+  .sources span.dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+
+  /* Footer */
+  footer{background:#131315;color:#8A8A93;padding:40px 0;border-top:1px solid #2C2C30}
+  .footer-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;font-size:13px}
+  .footer-inner a{color:#D6D6DB}
+  .footer-inner a:hover{text-decoration:underline}
+
+  @media (max-width:900px){
+    .browser-body{grid-template-columns:1fr}
+    .cards,.step-grid{grid-template-columns:1fr}
+    .browser{margin-bottom:-40px}
+  }
+  @media (max-width:768px){
+    .wrap{padding:0 20px}
+    .header-inner{height:64px}
+    .nav a.link{display:none}
+    .hero-inner{padding-top:48px}
+    .hero-sub{font-size:16px}
+    .cta-row .btn{width:100%}
+    section.block{padding:64px 0}
+    .browser{margin-top:36px}
+    .browser-body{padding:20px}
+    .browser-url{display:none}
+    .heat{max-width:100%}
+    .notice-box{flex-direction:column;gap:12px}
+    .steps{padding:64px 0}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="返回顶部">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#1C1C1E"/><rect x="7" y="8" width="14" height="12" rx="2" stroke="#A1A1AA" stroke-width="1.5"/><path d="M7 12H21" stroke="#A1A1AA" stroke-width="1.5"/><circle cx="17.5" cy="16" r="2" fill="#F59E0B"/></svg>
+      <span class="brand-name">TMEET WORKBENCH</span>
+    </a>
+    <nav class="nav">
+      <a class="link" href="#features">能力</a>
+      <a class="link" href="#steps">复刻步骤</a>
+      <a class="link" href="demo.html">在线演示</a>
+      <a class="btn-gh" href="https://github.com/binbinao/binbinao.github.io/tree/main/tmeeting-workbench" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <span class="badge"><i class="badge-dot"></i>腾讯会议 · 本地数据工作台</span>
+      <h1>把会议数据，<br>变成一张看得懂的工作台</h1>
+      <p class="hero-sub">零依赖单文件前端 + 本地桥接服务。授权腾讯会议后，月度日历热力图、每日会议、统计与预约，全部来自你的真实数据。</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="demo.html">打开在线演示</a>
+        <a class="btn btn-secondary" href="#steps">查看复刻步骤</a>
+      </div>
+      <p class="hero-note">公网站点为演示数据 · 真实会议数据请在本机 8787 运行</p>
+
+      <div class="browser" aria-label="工作台界面预览">
+        <div class="browser-bar">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="browser-url mono">localhost:8787/index.html</span>
+          <span class="pill"><i></i>腾讯会议已连接</span>
+        </div>
+        <div class="browser-body">
+          <div>
+            <p class="section-label">月度会议密度</p>
+            <div class="heat" aria-hidden="true">
+              <span></span><span class="l1"></span><span></span><span class="l2"></span><span></span><span class="l1"></span><span></span>
+              <span class="l1"></span><span class="l3"></span><span class="l2"></span><span></span><span class="l1"></span><span class="l3"></span><span class="l1"></span>
+              <span></span><span class="l2"></span><span class="l3"></span><span class="l1"></span><span></span><span class="l2"></span><span></span>
+              <span class="l1"></span><span></span><span class="l1"></span><span></span><span class="l2"></span><span></span><span class="l1"></span>
+            </div>
+            <p class="heat-note">深色代表会议更密集 · 冲突时段自动标记</p>
+          </div>
+          <div>
+            <p class="section-label">今天要处理</p>
+            <div class="meeting-list">
+              <div class="meeting-row">09:30&nbsp; 产品周会 · 进行中</div>
+              <div class="meeting-row">14:00&nbsp; A3 方案评审 · 待开始</div>
+              <div class="meeting-row">16:30&nbsp; 双周同步 · 待开始</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="notice">
+    <div class="wrap">
+      <div class="notice-box">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z" stroke="#F59E0B" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9v5" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1" fill="#F59E0B"/></svg>
+        <div>
+          <h3>为什么公网这一页看不到你的真实会议</h3>
+          <p>真实数据由你本机 <span class="mono">127.0.0.1:8787</span> 的桥接服务通过 tmeet CLI 读取，公网静态页面够不到本机服务，也不该把会议主题、参会人和入会链接放到公开站点。所以这里放的是可独立运行的演示版；日常使用与预约会议，请在你自己的机器上跑本地工作台。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="features">
+    <div class="wrap">
+      <p class="eyebrow">CAPABILITIES</p>
+      <h2>一个页面，管住整月会议</h2>
+      <p class="lead">前端只通过一个 <span class="mono">askDsh</span> 通道与后台通信，宿主内嵌、本地服务、直开文件三种形态自动切换，不降级伪造数据。</p>
+      <div class="cards">
+        <article class="card">
+          <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#B45309" stroke-width="1.6"/><path d="M3 10h18M8 3v4M16 3v4" stroke="#B45309" stroke-width="1.6" stroke-linecap="round"/><rect x="7" y="13" width="3" height="3" rx=".6" fill="#F59E0B"/><rect x="13" y="13" width="3" height="3" rx=".6" fill="#F59E0B"/></svg></div>
+          <h3>月度日历热力图</h3>
+          <p>按会议密度着色，冲突时段自动标记。整月节奏一眼看清，不用再翻聊天记录找时间。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#B45309" stroke-width="1.6"/><path d="M7 9h10M7 13h7M7 17h4" stroke="#B45309" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <h3>今日会议与详情</h3>
+          <p>状态、时间、主持人、入会入口集中呈现；详情弹窗里可看转写文件、云端纪要、复制邀请。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#B45309" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <h3>预约与统计</h3>
+          <p>表单直接写入腾讯会议，等候室、云录制、转写、水印一次设好；本周会议数与时长自动汇总。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="compare">
+    <div class="wrap">
+      <p class="eyebrow">TWO MODES</p>
+      <h2>两套形态，各管一半</h2>
+      <p class="lead">同一套前端页面，靠探测桥接自动决定走哪条数据通道。</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>形态</th><th>数据来源</th><th>访问范围</th><th>适合</th></tr></thead>
+          <tbody>
+            <tr><td>✅ 公网站点（本页 + 在线演示）</td><td>内置演示数据</td><td>任何设备、可分享</td><td>展示、复刻参考、评审</td></tr>
+            <tr><td>🔴 本地工作台（8787）</td><td>你的真实腾讯会议</td><td>仅本机 127.0.0.1</td><td>日常查看、预约会议、数据同步</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps" id="steps">
+    <div class="wrap">
+      <p class="eyebrow">REPLICATE</p>
+      <h2>三步，跑在你自己的机器上</h2>
+      <p class="lead">前端与桥接服务都是单文件，零依赖、不装框架。逐字落地即可，不需要重新生成页面。</p>
+      <div class="step-grid">
+        <div class="step">
+          <div class="step-no">STEP 01</div>
+          <h3>落地两个文件</h3>
+          <p>新建空目录，把资料库《工作台前端页面 index》与《serve.js 源码（逐字落地）》的产物逐字保存为 <span class="mono">index.html</span> 和 <span class="mono">serve.js</span>。</p>
+        </div>
+        <div class="step">
+          <div class="step-no">STEP 02</div>
+          <h3>启动本地桥接</h3>
+          <p>在该目录执行 <span class="mono">node serve.js</span>。服务只监听本机 8787，会自动发现 WorkBuddy 腾讯会议连接器同款 tmeet CLI。</p>
+        </div>
+        <div class="step">
+          <div class="step-no">STEP 03</div>
+          <h3>授权并打开页面</h3>
+          <p>在 WorkBuddy 左侧「专家 / 连接器」面板完成腾讯会议授权，再打开本地地址。顶栏变「已连接」后即同步真实会议。</p>
+        </div>
+      </div>
+
+      <div class="code-box">
+        <div class="code-head">
+          <span class="code-title mono">Terminal · macOS / Linux</span>
+          <button class="copy-btn" type="button" data-copy-target="cmd-block" aria-label="复制命令">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" stroke="currentColor" stroke-width="1.7"/></svg>
+            <span>复制</span>
+          </button>
+        </div>
+        <pre id="cmd-block"><span class="c"># 1. 建目录，放入 index.html 与 serve.js（逐字复制，不要改动）</span>
+mkdir tmeeting-workbench &amp;&amp; cd tmeeting-workbench
+
+<span class="c"># 2. 启动本地桥接服务（默认 http://localhost:8787）</span>
+<span class="k">node</span> serve.js
+
+<span class="c"># 3. 完成腾讯会议连接器授权后，打开工作台</span>
+<span class="k">open</span> http://localhost:8787/index.html</pre>
+      </div>
+
+      <div class="sources">
+        <a href="https://www.workbuddy.cn/space/d/1KBZphvL7Za0z9omlSoxpC" target="_blank" rel="noopener"><span class="dot"></span>工作台复刻指南（从这里开始）</a>
+        <a href="https://www.workbuddy.cn/space/d/rgTO4R5LgEO5wWf7LH1evO" target="_blank" rel="noopener"><span class="dot"></span>serve.js 源码（逐字落地）</a>
+        <a href="https://www.workbuddy.cn/space/d/hvCUksf6ynJFMOsscrdMgi" target="_blank" rel="noopener"><span class="dot"></span>tmeet CLI 集成约定</a>
+        <a href="https://www.workbuddy.cn/space/d/1fCwherYijGDGsnn9LyO4t" target="_blank" rel="noopener"><span class="dot"></span>工作台前端页面 index</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>TMEET WORKBENCH · 公开演示站点 · 不含任何真实会议数据</span>
+    <span>binbinao.github.io/tmeeting-workbench · 更新于 2026-11-05</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var btn = document.querySelector('.copy-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    var target = document.getElementById(btn.getAttribute('data-copy-target'));
+    if (!target) return;
+    var text = target.innerText;
+    var done = function () {
+      var label = btn.querySelector('span');
+      if (!label) return;
+      label.textContent = '已复制';
+      setTimeout(function () { label.textContent = '复制'; }, 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { fallback(text, done); });
+    } else {
+      fallback(text, done);
+    }
+  });
+  function fallback(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { /* 忽略 */ }
+    document.body.removeChild(ta);
+  }
+})();
+</script>
+</body>
+</html>
